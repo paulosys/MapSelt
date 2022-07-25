@@ -1,32 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mapselt/locationGPS.dart';
 
 class Mapa extends StatefulWidget {
   const Mapa({Key? key}) : super(key: key);
 
   @override
-  _MapaState createState() => _MapaState();
+  State<Mapa> createState() => _MapaState();
 }
 
 class _MapaState extends State<Mapa> {
   late GoogleMapController mapController;
-  
-  final LatLng _center = const LatLng(-7.112698572494305, -34.88402598608657);
 
-  void _onMapCreated(GoogleMapController controller) {
+  late LatLng _initialPosition;
+  bool hasLocation = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getUserLocation();
+  }
+
+  void getUserLocation() async {
+    var coords = await LocationGPS().getLoc();
+    setState(() {
+      _initialPosition = LatLng(coords.latitude, coords.longitude);
+      hasLocation = true;
+    });
+  }
+
+  void _onMapCreated(GoogleMapController controller) async {
     mapController = controller;
   }
 
-   
-
   @override
   Widget build(BuildContext context) {
-    return GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-        target: _center,
-        zoom: 11.0,
-      ),
+    return Scaffold(
+      // ignore: unnecessary_null_comparison
+      body: hasLocation == false
+          ? Container(
+            color: Colors.white,
+            )
+          : GoogleMap(
+              onMapCreated: _onMapCreated,
+              zoomControlsEnabled: false,
+              initialCameraPosition: CameraPosition(
+                target: _initialPosition,
+                zoom: 10.0,
+              ),
+              myLocationEnabled: true,
+            ),
     );
   }
 }

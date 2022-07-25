@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'google_map.dart';
+import 'locationGPS.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -10,6 +11,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var inputAddrController = TextEditingController();
+  var locationGPS = new LocationGPS();
+
+  @override
+  void initState() {
+    super.initState();
+    locationGPS.getLoc();
+  }
 
   void searchGeoCord(text) {
     print(text);
@@ -26,7 +34,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Padding(
+          /*Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 20.0,
             ),
@@ -44,11 +52,18 @@ class _HomePageState extends State<HomePage> {
                 hintText: 'Digite o endereço: ',
               ),
             ),
-          ),
+          ),*/
           const Expanded(
             child: Mapa(),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          print("clicou");
+        },
+        backgroundColor: Colors.green[900],
+        child: const Icon(Icons.add),
       ),
     );
   }
