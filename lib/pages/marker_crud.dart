@@ -2,50 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:mapselt/helpers/database_helper.dart';
 import 'package:mapselt/model/user_marker_model.dart';
 
-class RegistrarMarcacao extends StatefulWidget {
-  late double latitude;
-  late double longitude;
+class MarkerCRUD extends StatefulWidget {
+  late UserMarker marker;
 
-  RegistrarMarcacao({Key? key, required this.latitude, required this.longitude})
-      : super(key: key);
+  MarkerCRUD({Key? key, required this.marker}) : super(key: key);
 
   @override
-  State<RegistrarMarcacao> createState() => _RegistrarMarcacaoState();
+  State<MarkerCRUD> createState() => _MarkerCRUDState();
 }
 
-class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
-  final _registerFormKey = GlobalKey<FormState>();
+class _MarkerCRUDState extends State<MarkerCRUD> {
+  final _crudFormKey = GlobalKey<FormState>();
 
-  TextEditingController nomeController = TextEditingController(),
-      descricaoController = TextEditingController(),
-      dataVisitaController = TextEditingController(),
-      observacaoController = TextEditingController();
+  late TextEditingController nomeController;
+  late TextEditingController descricaoController;
+  late TextEditingController dataVisitaController;
+  late TextEditingController observacaoController;
+  String tipoMarker = 'publico';
 
-  String tipoMarker = "public";
-  final dbHelper = DatabaseHelper.instancia;
-
-  void registrarLugar() async {
-    String nome = nomeController.text;
-    String descricao = descricaoController.text;
-    String dataVisita = dataVisitaController.text;
-    String tipo = tipoMarker;
-    String observacao = observacaoController.text;
-
-    UserMarker novaMarcacao = UserMarker(
-      id: await dbHelper.getLenghtDb() + 1,
-      nome: nome,
-      descricao: descricao,
-      dataVisita: dataVisita,
-      tipo: tipo,
-      observacao: observacao,
-      latitude: widget.latitude,
-      longitude: widget.longitude,
-    );
-
-    dbHelper.inserirMarker(novaMarcacao);
+  @override
+  void initState() {
+    super.initState();
+    nomeController = TextEditingController(text: widget.marker.nome);
+    descricaoController = TextEditingController(text: widget.marker.descricao);
+    dataVisitaController =
+        TextEditingController(text: widget.marker.dataVisita);
+    observacaoController =
+        TextEditingController(text: widget.marker.observacao);
   }
 
   Future uepa() async {
+    final dbHelper = DatabaseHelper.instancia;
     var marcacoes = await dbHelper.consultarTodasMarcacoes();
 
     marcacoes.forEach(
@@ -57,17 +44,53 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
     return marcacoes;
   }
 
+  void excluirMarker(UserMarker marker) {
+    final dbHelper = DatabaseHelper.instancia;
+    dbHelper.deleteMarker(marker.id);
+  }
+
+  void atualizarLugar() {
+    final dbHelper = DatabaseHelper.instancia;
+    String nome = nomeController.text;
+    String descricao = descricaoController.text;
+    String dataVisita = dataVisitaController.text;
+    String tipo = tipoMarker;
+    String observacao = observacaoController.text;
+
+    UserMarker marker = UserMarker(
+      id: widget.marker.id,
+      nome: nome,
+      descricao: descricao,
+      dataVisita: dataVisita,
+      tipo: tipo,
+      observacao: observacao,
+      latitude: widget.marker.latitude,
+      longitude: widget.marker.longitude,
+    );
+
+    dbHelper.updateMarker(marker);
+  }
+
   @override
   Widget build(BuildContext context) {
     String _tipo = 'publico';
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text("MapSelt"),
-          backgroundColor: Colors.green[700],
+          title: SizedBox(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(widget.marker.nome),
+                IconButton(
+                    onPressed: (() => excluirMarker(widget.marker)),
+                    icon: const Icon(Icons.delete_forever))
+              ],
+            ),
+          ),
         ),
         body: Form(
-          key: _registerFormKey,
+          key: _crudFormKey,
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 20.0,
@@ -78,9 +101,9 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
                 TextFormField(
                   controller: nomeController,
                   decoration: const InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: 'Nome da localização:',
-                  ),
+                      border: UnderlineInputBorder(),
+                      labelText: 'Nome: ',
+                      suffixIcon: Icon(Icons.edit)),
                   validator: ((value) {
                     if (value == null || value.isEmpty) {
                       return "Campo Obrigatorio";
@@ -92,9 +115,9 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
                 TextFormField(
                   controller: descricaoController,
                   decoration: const InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: 'Descrição:',
-                  ),
+                      border: UnderlineInputBorder(),
+                      labelText: 'Descrição: ',
+                      suffixIcon: Icon(Icons.edit)),
                   textInputAction: TextInputAction.next,
                 ),
                 Row(
@@ -139,17 +162,17 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
                   controller: dataVisitaController,
                   keyboardType: TextInputType.datetime,
                   decoration: const InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: 'Data da visita:',
-                  ),
+                      border: UnderlineInputBorder(),
+                      labelText: 'Data da visita:',
+                      suffixIcon: Icon(Icons.edit)),
                   textInputAction: TextInputAction.next,
                 ),
                 TextFormField(
                   controller: observacaoController,
                   decoration: const InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: 'Observações:',
-                  ),
+                      border: UnderlineInputBorder(),
+                      labelText: 'Observações:',
+                      suffixIcon: Icon(Icons.edit)),
                   textInputAction: TextInputAction.done,
                 ),
                 TextButton(
@@ -163,8 +186,8 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            if (_registerFormKey.currentState!.validate()) {
-              registrarLugar();
+            if (_crudFormKey.currentState!.validate()) {
+              atualizarLugar();
               Navigator.pop(context);
             }
           },
