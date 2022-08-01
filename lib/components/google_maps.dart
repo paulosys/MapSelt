@@ -31,12 +31,23 @@ class MapaGoogle extends StatelessWidget {
                   local.showMarkerInfo(argument);
                 }),
               ),
-              IconButton(
-                onPressed: () {
-                  local.loadMarkers();
-                },
-                icon: const Icon(Icons.autorenew),
-                color: Colors.black,
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      local.loadMarkers();
+                    },
+                    icon: const Icon(Icons.autorenew),
+                    color: Colors.black,
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      local.criarMarkerGPS();
+                    },
+                    icon: const Icon(Icons.location_on_outlined),
+                    color: Colors.black,
+                  )
+                ],
               )
             ],
           );

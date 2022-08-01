@@ -8,9 +8,8 @@ import 'package:mapselt/helpers/database_helper.dart';
 import 'package:mapselt/model/user_marker_model.dart';
 
 class GoogleMapsController extends ChangeNotifier {
-
   // Set para armazenar os Markers e que o Widget utiliza para criar os Markers
-  Set<Marker> markers = <Marker>{}; 
+  Set<Marker> markers = <Marker>{};
 
   late GoogleMapController _mapsController;
   late GlobalKey key; // Usada para obter o context e abrir os Modal de info;
@@ -22,6 +21,15 @@ class GoogleMapsController extends ChangeNotifier {
     _mapsController = gmc;
     localizacaoAtual();
     loadMarkers();
+  }
+
+  void criarMarkerGPS() async {
+    List dados = await localizacaoAtual();
+  
+    if (dados.isNotEmpty) {
+      LatLng coords = LatLng(dados[0], dados[1]);
+      showMarkerInfo(coords);
+    }
   }
 
   // Método chamado no OnLongPress do Widget do GoogleMaps
@@ -37,7 +45,8 @@ class GoogleMapsController extends ChangeNotifier {
     String endereco =
         "${marker.street}, ${marker.name} - ${marker.subLocality}, ${marker.subAdministrativeArea} - ${marker.administrativeArea}, ${marker.postalCode}, ${marker.country}";
 
-    showModalBottomSheet( // Cria um Modal e mostra as informações
+    showModalBottomSheet(
+        // Cria um Modal e mostra as informações
         context: key.currentState!.context,
         builder: (context) => LocationInfo(
               endereco: endereco,
@@ -51,7 +60,7 @@ class GoogleMapsController extends ChangeNotifier {
     List<UserMarker> dados = await dbHelper.consultarTodasMarcacoes();
 
     if (dados.isEmpty) return;
-    
+
     markers.clear();
     for (UserMarker marker in dados) {
       markers.add(Marker(
@@ -69,22 +78,24 @@ class GoogleMapsController extends ChangeNotifier {
   }
 
   // Obtem a localização do usuário e move o mapa para ela.
-  void localizacaoAtual() async {
+  Future<List> localizacaoAtual() async {
+    List coords = [];
     String erro = "";
     try {
       locationgps.LocationData dados = await _localizacaoPermissoes();
-      LatLng coords = LatLng(dados.latitude!, dados.longitude!);
+      coords.addAll([dados.latitude, dados.longitude]);
       erro = "";
-      _mapsController.animateCamera(
-          CameraUpdate.newLatLngZoom(coords, 15));
+      _mapsController.animateCamera(CameraUpdate.newLatLngZoom(
+          LatLng(dados.latitude!, dados.longitude!), 15));
     } on Exception catch (e) {
       erro = e.toString();
     }
     notifyListeners();
+    return coords;
   }
 
   // Para obter a localização é necessario verificar se o usuário
-  // liberou o acesso, se sim chama o método para obter a localização. 
+  // liberou o acesso, se sim chama o método para obter a localização.
   Future<locationgps.LocationData> _localizacaoPermissoes() async {
     locationgps.Location location = locationgps.Location();
     locationgps.PermissionStatus permissao;
