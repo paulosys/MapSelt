@@ -5,17 +5,18 @@ class UserMarker {
   final String tipo;
   final String dataVisita;
   final String observacao;
+  final String? imagemPath;
   final double latitude;
   final double longitude;
 
   UserMarker(
-      {
-      required this.id,
+      {required this.id,
       required this.nome,
       required this.descricao,
       required this.tipo,
       required this.dataVisita,
       required this.observacao,
+      required this.imagemPath,
       required this.latitude,
       required this.longitude});
 
@@ -27,6 +28,7 @@ class UserMarker {
       'tipo': tipo,
       'dataVisita': dataVisita,
       'observacao': observacao,
+      'imagemPath': imagemPath,
       'latitude': latitude,
       'longitude': longitude
     };
@@ -40,6 +42,7 @@ class UserMarker {
             tipo: map['tipo'],
             dataVisita: map['dataVisita'],
             observacao: map['observacao'],
+            imagemPath: map['imagemPath'],
             latitude: map['latitude'],
             longitude: map['longitude']);
 }

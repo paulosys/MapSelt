@@ -3,18 +3,20 @@ import 'package:mapselt/model/user_marker_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
-class DatabaseHelper {
+class DatabaseHelper{
   final String _tabelaMarker = 'marker_mapa';
   final String _colId = 'id';
   final String _colNome = 'nome';
   final String _colDescricao = 'descricao';
   final String _colTipo = 'tipo';
   final String _colDataVisita = 'dataVisita';
+  final String _colImg = 'imagemPath';
   final String _colObservacao = 'observacao';
   final String _colLatitude = 'latitude';
   final String _colLongitude = 'longitude';
 
-  // Contrutor com acesso privado
+  // Contrutor com acesso privado para usar o padrao Singleton e manter 
+  // apenas uma conexão ao DB.
   DatabaseHelper._();
 
   // Criar uma instancia de DatabaseHelper
@@ -37,6 +39,7 @@ class DatabaseHelper {
     );
   }
 
+  // Cria a tabela no banco de dados.
   _onCreate(Database db, version) async {
     await db.execute('''
           CREATE TABLE $_tabelaMarker (
@@ -45,6 +48,7 @@ class DatabaseHelper {
             $_colDescricao TEXT,
             $_colTipo TEXT,
             $_colDataVisita TEXT,
+            $_colImg TEXT,
             $_colObservacao TEXT,
             $_colLatitude NUMERIC NOT NULL,
             $_colLongitude NUMERIC NOT NULL
@@ -64,6 +68,7 @@ class DatabaseHelper {
 
   void inserirMarker(UserMarker marker) async {
     Database db = await DatabaseHelper.instancia.database;
+    print(marker);
     await db.insert(_tabelaMarker, marker.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
@@ -90,6 +95,7 @@ class DatabaseHelper {
         where: 'id = ?', whereArgs: [marker.id]);
   }
 
+  // Utilizei para utilizar como ID na hora de registrar um UserMarker
   Future<int> getLenghtDb() async {
     Database db = await instancia.database;
     List<Map<String, dynamic>> maps = await db.query(_tabelaMarker);

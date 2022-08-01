@@ -16,7 +16,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text("MapSelt"),
         backgroundColor: Colors.green[700],
       ),
-      body: const MapaGoogle(),
+      body: MapaGoogle(),
     );
   }
 }

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mapselt/pages/marker_crud.dart';
 import 'package:mapselt/model/user_marker_model.dart';
 
@@ -8,44 +11,49 @@ class MarkerInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? imagemSelecionada = marker.imagemPath;
+
     return Container(
-      color: Colors.green[300],
+      color: Colors.white,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-        if (1 != 1) Image.network(marker.tipo),
-        Padding(
-            padding: const EdgeInsets.only(top: 24, left: 24),
-            child: Text(
-              marker.nome,
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
-            )),
-        Padding(
-            padding: const EdgeInsets.only(top: 24),
-            child: Text(
-              marker.descricao,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            )),
-        Padding(
-            padding: const EdgeInsets.only(top: 24),
-            child: Text(
-              marker.tipo,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            )),
-        Padding(
-            padding: const EdgeInsets.only(top: 24),
-            child: Text(
-              marker.dataVisita,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            )),
-        Padding(
-            padding: const EdgeInsets.only(top: 24),
-            child: Text(
-              marker.observacao,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            )),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(marker.nome,
+                    style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold)),
+              ),
+              imagemSelecionada == null
+                  ? Container()
+                  : SizedBox(
+                      height: 200,
+                      child: Image.file(File(imagemSelecionada)),
+                    ),
+              Column(
+                
+                children: [
+Text("Descrição: ${marker.descricao}",
+                  style: const TextStyle(color: Colors.black)),
+              Text("Tipo: ${marker.tipo}",
+                  style: const TextStyle(color: Colors.black)),
+              Text("Data da Visita: ${marker.dataVisita}",
+                  style: const TextStyle(color: Colors.black)),
+              Text("Observações: ${marker.observacao}",
+                  style: const TextStyle(color: Colors.black)),
+                ],
+              ),
+              
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
             TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -55,10 +63,22 @@ class MarkerInfo extends StatelessWidget {
                                 marker: marker,
                               )));
                 },
-                child: const Text("Editar"))
-          ],
-        )
-      ]),
+                child: const Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                          text: 'Editar  ',
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold)),
+                      WidgetSpan(child: Icon(Icons.edit, color: Colors.black)),
+                    ],
+                  ),
+                )),
+          ]),
+        ],
+      ),
     );
   }
 }

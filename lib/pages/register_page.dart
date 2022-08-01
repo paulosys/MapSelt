@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:mapselt/helpers/database_helper.dart';
 import 'package:mapselt/model/user_marker_model.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RegistrarMarcacao extends StatefulWidget {
   late double latitude;
@@ -21,15 +24,24 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
       dataVisitaController = TextEditingController(),
       observacaoController = TextEditingController();
 
-  String tipoMarker = "public";
+  String tipoMarker = "publico";
+
   final dbHelper = DatabaseHelper.instancia;
 
-  void registrarLugar() async {
+  ImagePicker imagePicker = ImagePicker();
+  XFile? imagemSelecionada;
+
+  void registrarMarker() async {
     String nome = nomeController.text;
     String descricao = descricaoController.text;
     String dataVisita = dataVisitaController.text;
     String tipo = tipoMarker;
     String observacao = observacaoController.text;
+    String? imgpath;
+
+    if (imagemSelecionada != null) {
+      imgpath = imagemSelecionada!.path;
+    }
 
     UserMarker novaMarcacao = UserMarker(
       id: await dbHelper.getLenghtDb() + 1,
@@ -38,6 +50,7 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
       dataVisita: dataVisita,
       tipo: tipo,
       observacao: observacao,
+      imagemPath: imgpath,
       latitude: widget.latitude,
       longitude: widget.longitude,
     );
@@ -45,23 +58,30 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
     dbHelper.inserirMarker(novaMarcacao);
   }
 
-  Future uepa() async {
-    var marcacoes = await dbHelper.consultarTodasMarcacoes();
+  void pegarImagemGaleria() async {
+    final XFile? imgTemp =
+        await imagePicker.pickImage(source: ImageSource.gallery);
+    if (imgTemp != null) {
+      setState(() {
+        imagemSelecionada = imgTemp;
+      });
+    }
+  }
 
-    marcacoes.forEach(
-      (element) {
-        print(element.toMap());
-      },
-    );
-
-    return marcacoes;
+  void pegarImagemCamera() async {
+    final XFile? imgTemp =
+        await imagePicker.pickImage(source: ImageSource.camera);
+    if (imgTemp != null) {
+      setState(() {
+        imagemSelecionada = imgTemp;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    String _tipo = 'publico';
-
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: const Text("MapSelt"),
           backgroundColor: Colors.green[700],
@@ -75,6 +95,23 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
             ),
             child: Column(
               children: <Widget>[
+                imagemSelecionada == null
+                    ? Container()
+                    : SizedBox(
+                        height: 200,
+                        child: Image.file(File(imagemSelecionada!.path)),
+                      ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                        onPressed: pegarImagemCamera,
+                        icon: const Icon(Icons.camera_alt_outlined)),
+                    IconButton(
+                        onPressed: pegarImagemGaleria,
+                        icon: const Icon(Icons.photo_album)),
+                  ],
+                ),
                 TextFormField(
                   controller: nomeController,
                   decoration: const InputDecoration(
@@ -102,33 +139,30 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
                   children: [
                     Radio(
                       value: "publico",
-                      groupValue: _tipo,
+                      groupValue: tipoMarker,
                       onChanged: (value) {
                         setState(() {
                           tipoMarker = value.toString();
-                          _tipo = value.toString();
                         });
                       },
                     ),
                     const Text("Publico"),
                     Radio(
                       value: "privado",
-                      groupValue: _tipo,
+                      groupValue: tipoMarker,
                       onChanged: (value) {
                         setState(() {
                           tipoMarker = value.toString();
-                          _tipo = value.toString();
                         });
                       },
                     ),
                     const Text("Privado"),
                     Radio(
                       value: "outro",
-                      groupValue: _tipo,
+                      groupValue: tipoMarker,
                       onChanged: (value) {
                         setState(() {
                           tipoMarker = value.toString();
-                          _tipo = value.toString();
                         });
                       },
                     ),
@@ -152,11 +186,6 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
                   ),
                   textInputAction: TextInputAction.done,
                 ),
-                TextButton(
-                    onPressed: () {
-                      uepa();
-                    },
-                    child: const Text("Consultar"))
               ],
             ),
           ),
@@ -164,7 +193,7 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             if (_registerFormKey.currentState!.validate()) {
-              registrarLugar();
+              registrarMarker();
               Navigator.pop(context);
             }
           },

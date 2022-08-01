@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mapselt/helpers/database_helper.dart';
 import 'package:mapselt/model/user_marker_model.dart';
 
@@ -18,7 +21,10 @@ class _MarkerCRUDState extends State<MarkerCRUD> {
   late TextEditingController descricaoController;
   late TextEditingController dataVisitaController;
   late TextEditingController observacaoController;
+  late String? imagempath;
   String tipoMarker = 'publico';
+
+  ImagePicker imagePicker = ImagePicker();
 
   @override
   void initState() {
@@ -29,19 +35,8 @@ class _MarkerCRUDState extends State<MarkerCRUD> {
         TextEditingController(text: widget.marker.dataVisita);
     observacaoController =
         TextEditingController(text: widget.marker.observacao);
-  }
 
-  Future uepa() async {
-    final dbHelper = DatabaseHelper.instancia;
-    var marcacoes = await dbHelper.consultarTodasMarcacoes();
-
-    marcacoes.forEach(
-      (element) {
-        print(element.toMap());
-      },
-    );
-
-    return marcacoes;
+    imagempath = widget.marker.imagemPath;
   }
 
   void excluirMarker(UserMarker marker) {
@@ -49,13 +44,14 @@ class _MarkerCRUDState extends State<MarkerCRUD> {
     dbHelper.deleteMarker(marker.id);
   }
 
-  void atualizarLugar() {
+  void atualizarMarker() {
     final dbHelper = DatabaseHelper.instancia;
     String nome = nomeController.text;
     String descricao = descricaoController.text;
     String dataVisita = dataVisitaController.text;
     String tipo = tipoMarker;
     String observacao = observacaoController.text;
+    String? img = imagempath;
 
     UserMarker marker = UserMarker(
       id: widget.marker.id,
@@ -64,6 +60,7 @@ class _MarkerCRUDState extends State<MarkerCRUD> {
       dataVisita: dataVisita,
       tipo: tipo,
       observacao: observacao,
+      imagemPath: img,
       latitude: widget.marker.latitude,
       longitude: widget.marker.longitude,
     );
@@ -71,11 +68,30 @@ class _MarkerCRUDState extends State<MarkerCRUD> {
     dbHelper.updateMarker(marker);
   }
 
+  void pegarImagemGaleria() async {
+    final XFile? imgTemp =
+        await imagePicker.pickImage(source: ImageSource.gallery);
+    if (imgTemp != null) {
+      setState(() {
+        imagempath = imgTemp.path;
+      });
+    }
+  }
+
+  void pegarImagemCamera() async {
+    final XFile? imgTemp =
+        await imagePicker.pickImage(source: ImageSource.camera);
+    if (imgTemp != null) {
+      setState(() {
+        imagempath = imgTemp.path;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    String _tipo = 'publico';
-
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: SizedBox(
             child: Row(
@@ -98,6 +114,23 @@ class _MarkerCRUDState extends State<MarkerCRUD> {
             ),
             child: Column(
               children: <Widget>[
+                imagempath == null
+                    ? Container()
+                    : SizedBox(
+                        height: 200,
+                        child: Image.file(File(imagempath!)),
+                      ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                        onPressed: pegarImagemCamera,
+                        icon: const Icon(Icons.camera_alt_outlined)),
+                    IconButton(
+                        onPressed: pegarImagemGaleria,
+                        icon: const Icon(Icons.photo_album)),
+                  ],
+                ),
                 TextFormField(
                   controller: nomeController,
                   decoration: const InputDecoration(
@@ -125,33 +158,30 @@ class _MarkerCRUDState extends State<MarkerCRUD> {
                   children: [
                     Radio(
                       value: "publico",
-                      groupValue: _tipo,
+                      groupValue: tipoMarker,
                       onChanged: (value) {
                         setState(() {
                           tipoMarker = value.toString();
-                          _tipo = value.toString();
                         });
                       },
                     ),
                     const Text("Publico"),
                     Radio(
                       value: "privado",
-                      groupValue: _tipo,
+                      groupValue: tipoMarker,
                       onChanged: (value) {
                         setState(() {
                           tipoMarker = value.toString();
-                          _tipo = value.toString();
                         });
                       },
                     ),
                     const Text("Privado"),
                     Radio(
                       value: "outro",
-                      groupValue: _tipo,
+                      groupValue: tipoMarker,
                       onChanged: (value) {
                         setState(() {
                           tipoMarker = value.toString();
-                          _tipo = value.toString();
                         });
                       },
                     ),
@@ -175,11 +205,6 @@ class _MarkerCRUDState extends State<MarkerCRUD> {
                       suffixIcon: Icon(Icons.edit)),
                   textInputAction: TextInputAction.done,
                 ),
-                TextButton(
-                    onPressed: () {
-                      uepa();
-                    },
-                    child: const Text("Consultar"))
               ],
             ),
           ),
@@ -187,7 +212,7 @@ class _MarkerCRUDState extends State<MarkerCRUD> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             if (_crudFormKey.currentState!.validate()) {
-              atualizarLugar();
+              atualizarMarker();
               Navigator.pop(context);
             }
           },
