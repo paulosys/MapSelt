@@ -64,7 +64,7 @@ class GoogleMapsController extends ChangeNotifier {
     markers.clear();
     for (UserMarker marker in dados) {
       markers.add(Marker(
-          markerId: MarkerId(marker.id.toString()),
+          markerId: MarkerId(marker.id),
           position: LatLng(marker.latitude, marker.longitude),
           onTap: () {
             showModalBottomSheet(

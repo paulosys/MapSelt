@@ -44,7 +44,7 @@ class _RegistrarMarcacaoState extends State<RegistrarMarcacao> {
     }
 
     UserMarker novaMarcacao = UserMarker(
-      id: await dbHelper.getLenghtDb() + 1,
+      id: nome,
       nome: nome,
       descricao: descricao,
       dataVisita: dataVisita,

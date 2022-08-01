@@ -1,5 +1,5 @@
 class UserMarker {
-  final int id;
+  final String id;
   final String nome;
   final String descricao;
   final String tipo;

@@ -43,7 +43,7 @@ class DatabaseHelper{
   _onCreate(Database db, version) async {
     await db.execute('''
           CREATE TABLE $_tabelaMarker (
-            $_colId INTEGER PRIMARY KEY AUTOINCREMENT,
+            $_colId TEXT PRIMARY KEY,
             $_colNome TEXT NOT NULL,
             $_colDescricao TEXT,
             $_colTipo TEXT,
@@ -95,10 +95,4 @@ class DatabaseHelper{
         where: 'id = ?', whereArgs: [marker.id]);
   }
 
-  // Utilizei para utilizar como ID na hora de registrar um UserMarker
-  Future<int> getLenghtDb() async {
-    Database db = await instancia.database;
-    List<Map<String, dynamic>> maps = await db.query(_tabelaMarker);
-    return maps.length;
-  }
 }

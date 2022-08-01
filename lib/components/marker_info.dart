@@ -35,48 +35,47 @@ class MarkerInfo extends StatelessWidget {
                       child: Image.file(File(imagemSelecionada)),
                     ),
               Column(
-                
                 children: [
-Text("Descrição: ${marker.descricao}",
-                  style: const TextStyle(color: Colors.black)),
-              Text("Tipo: ${marker.tipo}",
-                  style: const TextStyle(color: Colors.black)),
-              Text("Data da Visita: ${marker.dataVisita}",
-                  style: const TextStyle(color: Colors.black)),
-              Text("Observações: ${marker.observacao}",
-                  style: const TextStyle(color: Colors.black)),
+                  Text("Descrição: ${marker.descricao}",
+                      style: const TextStyle(color: Colors.black)),
+                  Text("Tipo: ${marker.tipo}",
+                      style: const TextStyle(color: Colors.black)),
+                  Text("Data da Visita: ${marker.dataVisita}",
+                      style: const TextStyle(color: Colors.black)),
+                  Text("Observações: ${marker.observacao}",
+                      style: const TextStyle(color: Colors.black)),
                 ],
               ),
-              
             ],
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-            TextButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => MarkerCRUD(
-                                marker: marker,
-                              )));
-                },
-                child: const Text.rich(
-                  TextSpan(
-                    children: [
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MarkerCRUD(
+                                    marker: marker,
+                                  )));
+                    },
+                    child: const Text.rich(
                       TextSpan(
-                          text: 'Editar  ',
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold)),
-                      WidgetSpan(child: Icon(Icons.edit, color: Colors.black)),
-                    ],
-                  ),
-                )),
-          ]),
+                        children: [
+                          TextSpan(
+                              text: 'Editar  ',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold)),
+                          WidgetSpan(
+                              child: Icon(Icons.edit, color: Colors.black)),
+                        ],
+                      ),
+                    )),
+              ]),
         ],
       ),
     );

@@ -22,7 +22,7 @@ class _MarkerCRUDState extends State<MarkerCRUD> {
   late TextEditingController dataVisitaController;
   late TextEditingController observacaoController;
   late String? imagempath;
-  String tipoMarker = 'publico';
+  late String tipoMarker;
 
   ImagePicker imagePicker = ImagePicker();
 
@@ -35,13 +35,14 @@ class _MarkerCRUDState extends State<MarkerCRUD> {
         TextEditingController(text: widget.marker.dataVisita);
     observacaoController =
         TextEditingController(text: widget.marker.observacao);
-
+    tipoMarker = widget.marker.tipo;
     imagempath = widget.marker.imagemPath;
   }
 
   void excluirMarker(UserMarker marker) {
     final dbHelper = DatabaseHelper.instancia;
     dbHelper.deleteMarker(marker.id);
+    Navigator.pop(context);
   }
 
   void atualizarMarker() {
