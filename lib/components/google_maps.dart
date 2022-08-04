@@ -50,7 +50,9 @@ class MapaGoogle extends StatelessWidget {
                   SizedBox(
                     width: 250,
                     child: Container(
-                      color: Colors.white,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Colors.white),
                       child: Padding(
                         padding: const EdgeInsets.only(left: 16.0),
                         child: TextFormField(
@@ -58,10 +60,17 @@ class MapaGoogle extends StatelessWidget {
                           decoration: InputDecoration(
                             labelText: 'Pesquise no mapa: ',
                             suffixIcon: IconButton(
-                                onPressed: (() => local.pesquisarMapa(local.pesquisarController.text)),
+                                onPressed: (() {
+                                  String endereco =
+                                      local.pesquisarController.text;
+                                  if (endereco.isNotEmpty) {
+                                    local.pesquisarMapa(endereco);
+                                  }
+                                }),
                                 icon: const Icon(Icons.search)),
                           ),
-                          onFieldSubmitted: ((value) => local.pesquisarMapa(value)),
+                          onFieldSubmitted: ((value) =>
+                              local.pesquisarMapa(value)),
                         ),
                       ),
                     ),
