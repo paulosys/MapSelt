@@ -46,9 +46,28 @@ class MapaGoogle extends StatelessWidget {
                     },
                     icon: const Icon(Icons.location_on_outlined),
                     color: Colors.black,
-                  )
+                  ),
+                  SizedBox(
+                    width: 250,
+                    child: Container(
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 16.0),
+                        child: TextFormField(
+                          controller: local.pesquisarController,
+                          decoration: InputDecoration(
+                            labelText: 'Pesquise no mapa: ',
+                            suffixIcon: IconButton(
+                                onPressed: (() => local.pesquisarMapa(local.pesquisarController.text)),
+                                icon: const Icon(Icons.search)),
+                          ),
+                          onFieldSubmitted: ((value) => local.pesquisarMapa(value)),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
-              )
+              ),
             ],
           );
         }),

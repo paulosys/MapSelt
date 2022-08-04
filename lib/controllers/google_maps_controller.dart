@@ -14,6 +14,8 @@ class GoogleMapsController extends ChangeNotifier {
   late GoogleMapController _mapsController;
   late GlobalKey key; // Usada para obter o context e abrir os Modal de info;
 
+  TextEditingController pesquisarController = TextEditingController();
+
   get mapsController => _mapsController;
 
   onMapCreated(GoogleMapController gmc, GlobalKey scaffoldKey) async {
@@ -53,6 +55,21 @@ class GoogleMapsController extends ChangeNotifier {
               latitude: coords.latitude,
               longitude: coords.longitude,
             ));
+  }
+
+  void pesquisarMapa(String endereco) async {
+    try {
+      List<geocoding.Location> dados =
+          await geocoding.locationFromAddress(endereco);
+
+      geocoding.Location coords = dados.first;
+      _mapsController.animateCamera(CameraUpdate.newLatLngZoom(
+          LatLng(coords.latitude, coords.longitude), 15));
+
+      showMarkerInfo(LatLng(coords.latitude, coords.longitude));
+    } on Exception catch (e) {
+      return;
+    }
   }
 
   void loadMarkers() async {
