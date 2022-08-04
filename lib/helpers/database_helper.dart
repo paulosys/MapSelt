@@ -62,20 +62,17 @@ class DatabaseHelper{
         await db.query(_tabelaMarker, where: 'id = ?', whereArgs: [id]);
 
     UserMarker marker = UserMarker.fromMap(maps.first);
-    print("marker: $marker");
     return marker;
   }
 
   void inserirMarker(UserMarker marker) async {
     Database db = await DatabaseHelper.instancia.database;
-    print(marker);
     await db.insert(_tabelaMarker, marker.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   void deleteMarker(id) async {
     Database db = await DatabaseHelper.instancia.database;
-
     db.delete(_tabelaMarker, where: 'id = ?', whereArgs: [id]);
   }
 

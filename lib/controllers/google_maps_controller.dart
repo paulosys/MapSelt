@@ -25,7 +25,7 @@ class GoogleMapsController extends ChangeNotifier {
 
   void criarMarkerGPS() async {
     List dados = await localizacaoAtual();
-  
+
     if (dados.isNotEmpty) {
       LatLng coords = LatLng(dados[0], dados[1]);
       showMarkerInfo(coords);
@@ -58,21 +58,21 @@ class GoogleMapsController extends ChangeNotifier {
   void loadMarkers() async {
     DatabaseHelper dbHelper = DatabaseHelper.instancia;
     List<UserMarker> dados = await dbHelper.consultarTodasMarcacoes();
-
-    if (dados.isEmpty) return;
-
     markers.clear();
-    for (UserMarker marker in dados) {
-      markers.add(Marker(
-          markerId: MarkerId(marker.id),
-          position: LatLng(marker.latitude, marker.longitude),
-          onTap: () {
-            showModalBottomSheet(
-                context: key.currentState!.context,
-                builder: (context) => MarkerInfo(
-                      marker: marker,
-                    ));
-          }));
+
+    if (dados.isNotEmpty) {
+      for (UserMarker marker in dados) {
+        markers.add(Marker(
+            markerId: MarkerId(marker.id),
+            position: LatLng(marker.latitude, marker.longitude),
+            onTap: () {
+              showModalBottomSheet(
+                  context: key.currentState!.context,
+                  builder: (context) => MarkerInfo(
+                        marker: marker,
+                      ));
+            }));
+      }
     }
     notifyListeners();
   }
